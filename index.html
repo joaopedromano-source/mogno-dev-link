@@ -1,0 +1,19 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mogno App · dev</title>
+<style>body{margin:0;font-family:-apple-system,system-ui,sans-serif;background:#EDF8FF;color:#032F53;display:flex;min-height:100vh;align-items:center;justify-content:center}main{background:#fff;border-radius:28px;box-shadow:0 18px 48px rgba(3,47,83,.12);padding:32px;max-width:420px;width:calc(100% - 40px);text-align:center}h1{font-size:18px;margin:0 0 4px}p{font-size:13px;color:#4E5A61;margin:0 0 20px}a.btn{display:inline-block;background:#032F53;color:#fff;text-decoration:none;border-radius:999px;padding:12px 22px;font-weight:600;font-size:14px}code{display:block;word-break:break-all;font-size:12px;background:#F2F7FB;border-radius:8px;padding:10px;margin:16px 0}img{width:200px;height:200px;margin:8px auto;display:block}small{color:#8195A1;font-size:11px}</style></head>
+<body><main><h1>Mogno App · ambiente de desenvolvimento</h1><p id="status">Buscando o endereço atual…</p>
+<a id="open" class="btn" href="#">Abrir no Expo Go</a><code id="url">…</code><img id="qr" alt="" hidden><small id="at"></small></main>
+<script>
+(async function(){
+  var owner=location.hostname.split('.')[0];
+  var api='https://api.github.com/repos/'+owner+'/mogno-dev-link/contents/current.json?ref=main';
+  var cur=null;
+  try{var r=await fetch(api,{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'});var j=await r.json();cur=JSON.parse(atob(j.content.replace(/\n/g,'')));}
+  catch(e){try{var r2=await fetch('current.json?ts='+Date.now(),{cache:'no-store'});cur=await r2.json();}catch(e2){}}
+  if(!cur){document.getElementById('status').textContent='Não consegui ler o endereço atual. Tente de novo.';return;}
+  var exp=cur.expo;document.getElementById('url').textContent=exp;document.getElementById('open').href=exp;
+  document.getElementById('status').textContent='Toque no botão no celular, ou leia o QR com o Expo Go.';
+  document.getElementById('at').textContent='atualizado às '+cur.at;
+  var qr=document.getElementById('qr');qr.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(exp);qr.hidden=false;
+  if(/Android|iPhone|iPad/i.test(navigator.userAgent)&&location.hash!=='#stay'){setTimeout(function(){location.href=exp;},800);}
+})();
+</script></body></html>
